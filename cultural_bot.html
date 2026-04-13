@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Культурный гид Москвы</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p { font-size: 1.1rem; opacity: 0.95; }
+        
+        .stats-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .sidebar h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .category-btn {
+            width: 100%;
+            padding: 10px 15px;
+            margin: 5px 0;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .category-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateX(5px);
+        }
+        
+        .random-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: transform 0.3s ease;
+        }
+        
+        .random-btn:hover { transform: scale(1.02); }
+        
+        .content {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            min-height: 500px;
+        }
+        
+        .recommendations { display: grid; gap: 20px; }
+        
+        .site-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .site-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .site-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .site-address {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .site-district {
+            color: #888;
+            font-size: 0.85rem;
+            margin-bottom: 8px;
+        }
+        
+        .site-status {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .status-federal { background: #d9534f; color: white; }
+        .status-regional { background: #5bc0de; color: white; }
+        .status-other { background: #2c7fb8; color: white; }
+        
+        .category-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.7rem;
+            background: #e9ecef;
+            color: #495057;
+            margin-left: 10px;
+        }
+        
+        .map-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        .map-link:hover { text-decoration: underline; }
+        
+        .loading, .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-close:hover { color: #333; }
+        
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+            padding-right: 30px;
+        }
+        
+        .modal-field { margin: 12px 0; }
+        .modal-label { font-weight: bold; color: #555; margin-bottom: 5px; }
+        
+        @media (max-width: 768px) {
+            .main-content { grid-template-columns: 1fr; }
+            .sidebar { position: static; }
+            .header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏛️ Культурный гид Москвы</h1>
+            <p>Откройте для себя уникальные культурные объекты столицы</p>
+            <div class="stats-badge" id="statsBadge">Загрузка...</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <h3>📂 Категории</h3>
+                <div id="categoriesList"></div>
+                <button class="random-btn" onclick="getRandomRecommendations()">🎲 Случайные рекомендации</button>
+            </div>
+            
+            <div class="content">
+                <div id="recommendationsArea">
+                    <div class="loading">✨ Выберите категорию или нажмите "Случайные рекомендации"</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        const allSites = [{"name": "Государственная Третьяковская галерея", "address": "Лаврушинский переулок, 10", "district": "Якиманка", "category": "Музеи и галереи", "status": "Федерального значения", "description": "Главный музей национального искусства России, основанный в 1856 году.", "coords": {"lat": 55.7415, "lon": 37.6208}}, {"name": "Большой театр", "address": "Театральная площадь, 1", "district": "Тверской", "category": "Театры", "status": "Федерального значения", "description": "Знаменитый театр оперы и балета, символ русской культуры.", "coords": {"lat": 55.7602, "lon": 37.6186}}, {"name": "Московский Кремль", "address": "Кремль", "district": "Тверской", "category": "Усадьбы и дворцы", "status": "Федерального значения", "description": "Древнейшая часть Москвы, главный исторический и архитектурный комплекс.", "coords": {"lat": 55.7517, "lon": 37.6177}}, {"name": "Храм Христа Спасителя", "address": "улица Волхонка, 15", "district": "Хамовники", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Главный кафедральный собор Русской православной церкви.", "coords": {"lat": 55.7448, "lon": 37.6056}}, {"name": "Парк Зарядье", "address": "улица Варварка, 6", "district": "Тверской", "category": "Парки и сады", "status": "Регионального значения", "description": "Современный ландшафтный парк с панорамным видом на Кремль.", "coords": {"lat": 55.7512, "lon": 37.6285}}, {"name": "Музей-заповедник Коломенское", "address": "проспект Андропова, 39", "district": "Нагатинский Затон", "category": "Музеи и галереи", "status": "Федерального значения", "description": "Бывшая царская усадьба, уникальный архитектурный ансамбль.", "coords": {"lat": 55.6675, "lon": 37.6705}}, {"name": "Новодевичий монастырь", "address": "Новодевичий проезд, 1", "district": "Хамовники", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Женский православный монастырь, объект Всемирного наследия ЮНЕСКО.", "coords": {"lat": 55.7259, "lon": 37.5569}}, {"name": "Центральный парк культуры и отдыха им. Горького", "address": "Крымский Вал, 9", "district": "Якиманка", "category": "Парки и сады", "status": "Регионального значения", "description": "Главный парк Москвы с множеством развлечений и событий.", "coords": {"lat": 55.7286, "lon": 37.6038}}, {"name": "Московский государственный университет", "address": "Ленинские горы, 1", "district": "Раменки", "category": "Памятники", "status": "Федерального значения", "description": "Главное здание МГУ на Воробьевых горах, сталинская высотка.", "coords": {"lat": 55.7039, "lon": 37.5306}}, {"name": "ВДНХ", "address": "проспект Мира, 119", "district": "Останкинский", "category": "Парки и сады", "status": "Федерального значения", "description": "Выставочный комплекс, парк и архитектурный ансамбль.", "coords": {"lat": 55.8279, "lon": 37.6395}}, {"name": "Малый театр", "address": "Театральный проезд, 1", "district": "Тверской", "category": "Театры", "status": "Федерального значения", "description": "Один из старейших драматических театров России.", "coords": {"lat": 55.7598, "lon": 37.6202}}, {"name": "Московский Художественный театр им. Чехова", "address": "Камергерский переулок, 3", "district": "Тверской", "category": "Театры", "status": "Федерального значения", "description": "Легендарный театр, основанный Станиславским и Немировичем-Данченко.", "coords": {"lat": 55.7606, "lon": 37.6142}}, {"name": "Пушкинский музей", "address": "улица Волхонка, 12", "district": "Хамовники", "category": "Музеи и галереи", "status": "Федерального значения", "description": "Музей мирового искусства с богатой коллекцией.", "coords": {"lat": 55.7472, "lon": 37.605}}, {"name": "Архангельский собор", "address": "Соборная площадь, Кремль", "district": "Тверской", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Усыпальница московских князей и царей.", "coords": {"lat": 55.7503, "lon": 37.6177}}, {"name": "Усадьба Кусково", "address": "улица Юности, 2", "district": "Вешняки", "category": "Усадьбы и дворцы", "status": "Федерального значения", "description": "Бывшая усадьба графов Шереметевых, памятник архитектуры XVIII века.", "coords": {"lat": 55.7357, "lon": 37.8082}}, {"name": "Донской монастырь", "address": "Донская площадь, 1", "district": "Донской", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Ставропигиальный мужской монастырь, основанный в 1591 году.", "coords": {"lat": 55.7139, "lon": 37.6028}}, {"name": "Царицыно", "address": "Дольская улица, 1", "district": "Орехово-Борисово Северное", "category": "Усадьбы и дворцы", "status": "Федерального значения", "description": "Дворцово-парковый ансамбль, построенный для Екатерины II.", "coords": {"lat": 55.6145, "lon": 37.68}}, {"name": "Дом-музей В.М. Васнецова", "address": "переулок Васнецова, 13", "district": "Мещанский", "category": "Музеи и галереи", "status": "Регионального значения", "description": "Дом, в котором жил и работал знаменитый художник.", "coords": {"lat": 55.7725, "lon": 37.6335}}, {"name": "Памятник Минину и Пожарскому", "address": "Красная площадь", "district": "Тверской", "category": "Памятники", "status": "Федерального значения", "description": "Скульптурная группа работы Ивана Мартоса.", "coords": {"lat": 55.7527, "lon": 37.6228}}, {"name": "Сад Эрмитаж", "address": "Каретный Ряд, 3", "district": "Тверской", "category": "Парки и сады", "status": "Регионального значения", "description": "Исторический парк в центре Москвы с театрами.", "coords": {"lat": 55.7705, "lon": 37.609}}, {"name": "Государственный исторический музей", "address": "Красная площадь, 1", "district": "Тверской", "category": "Музеи и галереи", "status": "Федерального значения", "description": "Крупнейший национальный исторический музей России.", "coords": {"lat": 55.7554, "lon": 37.6181}}, {"name": "Собор Василия Блаженного", "address": "Красная площадь", "district": "Тверской", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Символ Москвы, памятник русской архитектуры.", "coords": {"lat": 55.7525, "lon": 37.6231}}, {"name": "Театр на Таганке", "address": "Земляной Вал, 76", "district": "Таганский", "category": "Театры", "status": "Регионального значения", "description": "Знаменитый театр, связанный с именем Юрия Любимова.", "coords": {"lat": 55.746, "lon": 37.655}}, {"name": "Музей космонавтики", "address": "проспект Мира, 111", "district": "Останкинский", "category": "Музеи и галереи", "status": "Федерального значения", "description": "Музей, посвященный истории освоения космоса.", "coords": {"lat": 55.8232, "lon": 37.6399}}, {"name": "Даниловский монастырь", "address": "Даниловский Вал, 22", "district": "Даниловский", "category": "Храмы и монастыри", "status": "Федерального значения", "description": "Старейший монастырь Москвы, основанный Даниилом Московским.", "coords": {"lat": 55.7108, "lon": 37.6302}}];
+        const categories = ["Храмы и монастыри", "Усадьбы и дворцы", "Музеи и галереи", "Театры", "Парки и сады", "Памятники"];
+        
+        const icons = {
+            "Храмы и монастыри": "⛪",
+            "Усадьбы и дворцы": "🏰",
+            "Музеи и галереи": "🏛️",
+            "Театры": "🎭",
+            "Парки и сады": "🌳",
+            "Памятники": "🗿"
+        };
+        
+        function updateStats() {
+            const total = allSites.length;
+            const federal = allSites.filter(s => s.status === 'Федерального значения').length;
+            const regional = allSites.filter(s => s.status === 'Регионального значения').length;
+            document.getElementById('statsBadge').innerHTML = '📊 Всего: ' + total + ' | 🔴 Федеральных: ' + federal + ' | 🔵 Региональных: ' + regional;
+        }
+        
+        function getRandomSites(category, count) {
+            count = count || 5;
+            let filtered = allSites;
+            if (category !== "all") {
+                filtered = allSites.filter(s => s.category === category);
+            }
+            if (filtered.length === 0) return [];
+            const shuffled = [...filtered];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled.slice(0, count);
+        }
+        
+        function getStatusClass(status) {
+            if (status === 'Федерального значения') return 'status-federal';
+            if (status === 'Регионального значения') return 'status-regional';
+            return 'status-other';
+        }
+        
+        function displayRecommendations(sites) {
+            const container = document.getElementById('recommendationsArea');
+            if (!sites || sites.length === 0) {
+                container.innerHTML = '<div class="no-results">😕 Нет объектов в этой категории</div>';
+                return;
+            }
+            
+            let html = '<div class="recommendations">';
+            for (let i = 0; i < sites.length; i++) {
+                const site = sites[i];
+                const addressShort = site.address.length > 100 ? site.address.substring(0, 100) + '...' : site.address;
+                const siteData = JSON.stringify(site).replace(/"/g, '&quot;');
+                html += '<div class="site-card" onclick="showDetails(' + siteData + ')">';
+                html += '<div class="site-name">' + site.name + '<span class="category-badge">' + site.category + '</span></div>';
+                html += '<div class="site-address">📍 ' + addressShort + '</div>';
+                html += '<div class="site-district">🏘️ ' + site.district + '</div>';
+                html += '<span class="site-status ' + getStatusClass(site.status) + '">' + site.status + '</span>';
+                if (site.coords) {
+                    html += '<div style="margin-top: 10px;"><a href="https://www.google.com/maps?q=' + site.coords.lat + ',' + site.coords.lon + '" target="_blank" class="map-link">🗺️ Открыть на карте →</a></div>';
+                }
+                html += '</div>';
+            }
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function getRecommendationsByCategory(category) {
+            const sites = getRandomSites(category, 6);
+            displayRecommendations(sites);
+        }
+        
+        function getRandomRecommendations() {
+            const sites = getRandomSites("all", 6);
+            displayRecommendations(sites);
+        }
+        
+        function showDetails(site) {
+            const modalContent = document.getElementById('modalContent');
+            const statusClass = getStatusClass(site.status);
+            let statusText = site.status === 'Федерального значения' ? '🔴 Федерального значения' : (site.status === 'Регионального значения' ? '🔵 Регионального значения' : '📘 ' + site.status);
+            
+            let html = '<div class="modal-title">🏛️ ' + site.name + '</div>';
+            html += '<div class="modal-field"><div class="modal-label">📍 Адрес:</div><div>' + site.address + '</div></div>';
+            html += '<div class="modal-field"><div class="modal-label">🏘️ Район:</div><div>' + site.district + '</div></div>';
+            html += '<div class="modal-field"><div class="modal-label">📂 Категория:</div><div>' + site.category + '</div></div>';
+            html += '<div class="modal-field"><div class="modal-label">📜 Статус:</div><div><span class="site-status ' + statusClass + '">' + statusText + '</span></div></div>';
+            if (site.description) {
+                html += '<div class="modal-field"><div class="modal-label">ℹ️ Описание:</div><div>' + site.description + '</div></div>';
+            }
+            if (site.coords) {
+                html += '<div class="modal-field"><div class="modal-label">🗺️ Карта:</div><div><a href="https://www.google.com/maps?q=' + site.coords.lat + ',' + site.coords.lon + '" target="_blank" style="color: #667eea;">Открыть в Google Maps →</a></div></div>';
+            }
+            modalContent.innerHTML = html;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) modal.style.display = 'none';
+        }
+        
+        function buildCategories() {
+            const container = document.getElementById('categoriesList');
+            let html = '';
+            for (let i = 0; i < categories.length; i++) {
+                const cat = categories[i];
+                const icon = icons[cat] || '📚';
+                html += '<button class="category-btn" onclick="getRecommendationsByCategory('' + cat + '')">' + icon + ' ' + cat + '</button>';
+            }
+            container.innerHTML = html;
+        }
+        
+        function init() {
+            updateStats();
+            buildCategories();
+            getRandomRecommendations();
+        }
+        
+        init();
+    </script>
+</body>
+</html>
